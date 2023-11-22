@@ -1,1 +1,2 @@
-My first readme
+0. Fork me if you can!
+1. Bug free!
