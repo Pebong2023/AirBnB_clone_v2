@@ -1,31 +1,52 @@
 #!/usr/bin/python3
-"""Starts a Flask web application.
 
-The application listens on 0.0.0.0, port 5000.
-Routes:
-    /hbnb_filters: HBnB HTML filters page.
-"""
 from models import storage
-from flask import Flask
+from flask import flask
 from flask import render_template
 
 app = Flask(__name__)
 
+# Define the route for '/states' and specify
+#	strict_slashes=False to handle trailing slashes
+@app.route("/states", strict_slashes=False)
+def states():
+	"""Displays an HTML page with a list of all States.
 
-@app.route("/hbnb_filters", strict_slashes=False)
-def hbnb_filters():
-    """Displays the main HBnB filters HTML page."""
-    states = storage.all("State")
-    amenities = storage.all("Amenity")
-    return render_template("10-hbnb_filters.html",
-                           states=states, amenities=amenities)
+	Staes are sorted by name.
+	"""
+	# Fetch all State Objects from the
+	#	Storage (FileStorage or DBStorage)
+	states = storage.all("State")
+
+	# Render the "9-states.html" template and
+	#	pass the list of states as the variable 'state'
+	return render_template("9-states.html", state=states)
+
+# Define the route for '/states/<id>' and
+#	specify strict_slashes=False to handle trailing slashes
+@app.route("/states/<id>", strict_slashes=False)
+def states_id(id):
+	"""Displays an HTML page with with info about <id>, if it exists."""
+
+	# Loop thrugh all state objects in
+	#	the storage (FileStorage of DBStorage)
+	for state in storage.all("State").values():
+		# check if the current state object's id matches the requested <id>
+		if state.id == id:
+			# if a matching state is found,
+			#	render the "9-states.html" template and pass the state object
+			return render_template("9-states.html)
 
 
+# Teardown app context to remove
+#	the current SQLAIchemy session after each request
 @app.teardown_appcontext
 def teardown(exc):
-    """Remove the current SQLAlchemy session."""
-    storage.close()
+	"""Remove the current SQLAIchemy session."""
+	storage.close()
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+	# Start the Flask development server
+	# Listen on all available network interfaces (0.0.0.0) and port 5000
+	app.run(host="0.0.0.0")
